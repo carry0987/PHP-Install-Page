@@ -1,6 +1,7 @@
 //Check third-party library usable
 if (!Utils) throw new Error('Utils-Full not found');
 if (!window.jQuery) throw new Error('jQuery not found');
+if (!Swal) throw new Error('SweetAlert2 not found');
 
 class InstallHelper {
     'use strict'
@@ -95,6 +96,22 @@ class InstallHelper {
         });
     }
 
+    showSwal = (title, text, icon, showLoading = false, willOpenCallback = null) => {
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: icon,
+            showConfirmButton: false,
+            allowOutsideClick: !showLoading,
+            allowEnterKey: !showLoading,
+            allowEscapeKey: !showLoading,
+            willOpen: willOpenCallback
+        });
+        if (showLoading) {
+            Swal.showLoading();
+        }
+    }
+
     //Get language list
     langList = () => {
         return this.fetchData({ request: 'get_language' }, data => data['lang']);
@@ -110,7 +127,6 @@ class InstallHelper {
 
         // Lang
         const lang = await this.langList();
-        console.log(lang);
 
         // Input actions
         this.inputActions = {
@@ -171,7 +187,6 @@ class InstallHelper {
         $('#install').on('input', 'input', (event) => {
             const $input = $(event.target);
             $input.removeClass('bg-danger-subtle');
-            this.validateInputs();
         });
 
         $('#install').on('input blur', 'input', (event) => {
@@ -188,7 +203,60 @@ class InstallHelper {
                 return false;
             }
             if (!$(event.target).find('#submit').prop('disabled')) {
-                console.log('submit');
+                const formData = new FormData(event.target);
+                const formObject = {};
+                for (let [key, value] of formData.entries()) {
+                    formObject[key] = value;
+                }
+                Swal.fire({
+                    text: lang['install']['installing'],
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEnterKey: false,
+                    allowEscapeKey: false,
+                    willOpen: () => {
+                        $('#install, #form-title').hide();
+                    },
+                    didOpen: () => {
+                        self.showSwal(
+                            null,
+                            lang['install']['installing'],
+                            null,
+                            true,
+                            () => {
+                                $('#install, #form-title').hide();
+                                formObject['request'] = 'start_install';
+                                self.sendFormData('api.php', formObject, 'POST', function(res) {
+                                    Swal.hideLoading();
+                                    if (res['status'] === true) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            html: lang['install']['install_success']+'<br>'+lang['install']['install_remove'],
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                window.location.href = 'index.php';
+                                            }
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            text: res['message']
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                window.location.reload();
+                                            }
+                                        });
+                                    }
+                                }, function(error) {
+                                    self.showSwal('Error', error, 'error');
+                                });
+                            }
+                        );
+                    },
+                    didClose: () => {
+                        $('#install, #form-title').show();
+                    }
+                });
             }
         });
     }

@@ -63,8 +63,17 @@ class API
                     return self::$param['lang']->setLanguage($data['lang'], self::$system['https']);
                     break;
                 case 'start_install':
-                    $config = array();
-                    $installer = new Installer(self::$param['lang'], $config);
+                    $config = array(
+                        'config_path' => self::$param['config_path'],
+                        'root_path' => self::$param['root_path']
+                    );
+                    $installer = new Installer(self::$param['lang'], $data, $config);
+                    try {
+                        $installer->startInstall();
+                        return array('status' => true);
+                    } catch (\Exception $e) {
+                        return array('status' => false, 'message' => $e->getMessage());
+                    }
                     break;
             }
         }

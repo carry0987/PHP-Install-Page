@@ -8,6 +8,7 @@ use PDOException;
 class Installer
 {
     protected $lang;
+    protected $data;
     protected $config;
     protected $dbHost;
     protected $dbName;
@@ -23,10 +24,11 @@ class Installer
     const DIR_SEP = DIRECTORY_SEPARATOR;
     const CONFIG_ROOT = __DIR__.'/../../';
 
-    public function __construct(Language $lang, array $config)
+    public function __construct(Language $lang, array $data, array $config = [])
     {
         $this->lang = $lang;
-        $this->config = $config;
+        $this->data = $data;
+        $this->config = array_merge($this->getDefaultConfigValue(), $config);
 
         $this->dbHost = $this->getInput('db_host');
         $this->dbName = $this->getInput('db_name');
@@ -37,8 +39,6 @@ class Installer
         $this->adminUsername = $this->getInput('admin_username');
         $this->adminPassword = $this->getInput('admin_password');
         $this->adminPswConfirm = $this->getInput('admin_psw_confirm');
-        $this->validatePassword();
-        $this->validateRequiredFields();
     }
 
     public function setUserQuery(string $query)
@@ -48,14 +48,20 @@ class Installer
 
     public function startInstall()
     {
+        if ($this->validatePassword() !== true) {
+            throw new \Exception($this->validatePassword());
+        }
+        if ($this->validateRequiredFields() !== true) {
+            throw new \Exception($this->validateRequiredFields());
+        }
         if ($this->checkInstallStatus() === true) {
-            throw new \Exception($this->lang->getLang('install.already_installed'));
+            throw new \Exception($this->lang->getLang('install.installed'));
         }
         if ($this->checkPermission() !== true) {
             throw new \Exception($this->checkPermission());
         }
         $conn = $this->validateDatabaseConnection();
-        if ($conn !== true) {
+        if (is_string($conn)) {
             throw new \Exception($conn);
         }
         $createDatabase = $this->startCreateDatabase($conn);
@@ -184,12 +190,29 @@ class Installer
         for ($i = 0; $i < $length; $i++) {
             $id .= $word[rand() % $len];
         }
+
         return $id;
+    }
+
+    protected function getDefaultConfigValue()
+    {
+        return [
+            'system_path' => '/',
+            'config_path' => __DIR__ . '/../../config',
+            'config_file' => 'config.inc.php',
+            'lock_file' => 'installed.lock',
+            'sql_file' => ['data', 'config'],
+            'mroonga_file' => 'fulltext',
+            'root_path' => __DIR__ . '/../../',
+            'check_write_permission' => ['cache', 'config', 'template']
+        ];
     }
 
     protected function checkInstallStatus()
     {
-        if (file_exists(dirname(dirname(dirname(__FILE__))).'/config/'.CONFIG_FILE)) {
+        $config_file = $this->config['config_path'].'/'.$this->config['config_file'];
+        $lock_file = $this->config['config_path'].'/'.$this->config['lock_file'];
+        if (file_exists($config_file) || file_exists($lock_file)) {
             return true;
         }
 
@@ -198,11 +221,11 @@ class Installer
 
     protected function checkPermission()
     {
-        $checkPermission = dirname(dirname(dirname(__FILE__)));
+        $checkPermission = self::trimPath($this->config['root_path'].'/');
         $folders = $this->config['check_write_permission'];
 
         foreach ($folders as $folder) {
-            if (!is_writeable($checkPermission.'/'.$folder)) {
+            if (!is_writeable($checkPermission.$folder)) {
                 return self::showMsg('', $this->lang->getLang('install.permission_denied').'\''.$folder.'\'');
             }
         }
@@ -212,8 +235,8 @@ class Installer
 
     protected function getInput(string $field, string $default = '')
     {
-        if (isset($_POST[$field])) {
-            return self::inputFilter($_POST[$field]);
+        if (isset($this->data[$field])) {
+            return self::inputFilter($this->data[$field]);
         }
         if ($default !== '') {
             return $default;
@@ -222,49 +245,10 @@ class Installer
         throw new \Exception($this->lang->getLang('install.input_empty'));
     }
 
-    protected function getDefaultConfig(array $config)
-    {
-        $db_host = $config['db_host'];
-        $db_name = $config['db_name'];
-        $db_port = $config['db_port'];
-        $db_user = $config['db_user'];
-        $db_password = $config['db_password'];
-        $get_path = rtrim(dirname(dirname(dirname($_SERVER['PHP_SELF']))), '/');
-        $session_id = self::generateRandomString();
-        $user_uuid_key = self::generateRandomString(18);
-        $image_uuid_key = self::generateRandomString(18);
-        $maintenance_uuid_key = self::generateRandomString(18);
-
-        $defaultConfig = <<<EOT
-        <?php
-        define('DB_HOST', '$db_host');
-        define('DB_USER', '$db_user');
-        define('DB_PASSWORD', '$db_password');
-        define('DB_NAME', '$db_name');
-        define('DB_PORT', '$db_port');
-        define('SYSTEM_PATH', '$get_path');
-        define('SESSION_ID', '$session_id');
-        define('USER_KEY', '$user_uuid_key');
-        define('IMAGE_KEY', '$image_uuid_key');
-        define('MAINTENANCE_KEY', '$maintenance_uuid_key');
-        define('DEBUG', false);
-        
-        //Redis config
-        define('REDIS_HOST', '');
-        define('REDIS_PORT', 6379);
-        define('REDIS_DATABASE', 0);
-        define('REDIS_PASSWORD', '');
-        define('REDIS_MAXTTL', 86400);
-        
-        EOT;
-
-        return $defaultConfig;
-    }
-
     protected function validatePassword()
     {
         if ($this->adminPassword !== $this->adminPswConfirm) {
-            throw new \Exception($this->lang->getLang('install.repassword_error'));
+            return $this->lang->getLang('install.repassword_error');
         }
 
         return true;
@@ -300,8 +284,11 @@ class Installer
 
     protected function validateDatabaseConnection()
     {
+        $dbHost = $this->dbHost;
+        $dbName = $this->dbName;
+        $dbPort = $this->dbPort;
         try {
-            $dsn = "mysql:host=$this->dbHost;dbname=$this->dbName;port=$this->dbPort;charset=utf8mb4";
+            $dsn = "mysql:host=$dbHost;dbname=$dbName;port=$dbPort;charset=utf8mb4";
             $options = [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -316,9 +303,9 @@ class Installer
 
     protected function startCreateDatabase(PDO $conn)
     {
-        $sql_file = ['data', 'config', 'template', 'tag', 'inbox_mail', 'area_data', 'social'];
+        $sql_files = $this->config['sql_file'];
         try {
-            foreach ($sql_file as $value) {
+            foreach ($sql_files as $value) {
                 if (file_exists(self::CONFIG_ROOT.'/database/'.$value.'.sql')) {
                     $sql = self::createDatabaseTable($conn, self::CONFIG_ROOT.'/database/'.$value.'.sql');
                     if ($sql !== true) {
@@ -329,8 +316,9 @@ class Installer
                 }
             }
             //Check Mroonga Support
-            if (self::checkMroongaSupport($conn) === true && file_exists(self::CONFIG_ROOT.'/database/fulltext.sql')) {
-                $sql = self::createDatabaseTable($conn, self::CONFIG_ROOT.'/database/fulltext.sql');
+            $mroonga_file = self::CONFIG_ROOT.'/database/'.$this->config['mroonga_file'].'.sql';
+            if (self::checkMroongaSupport($conn) === true && file_exists($mroonga_file)) {
+                $sql = self::createDatabaseTable($conn, $mroonga_file);
                 if ($sql !== true) {
                     return $sql;
                 }
@@ -347,7 +335,7 @@ class Installer
         $password = password_hash($this->adminPassword, PASSWORD_DEFAULT);
         $group_id = 1;
         $language = $this->webLang;
-        $last_login = $join_date = date('Y-m-d H:i:s');
+        $last_login = $join_date = time();
         try {
             $stmt = $conn->prepare(self::$userQuery);
             $stmt->bindValue(':username', $this->adminUsername, PDO::PARAM_STR);
@@ -364,17 +352,49 @@ class Installer
         return true;
     }
 
+    protected function getConfigContent()
+    {
+        $templatePath = self::CONFIG_ROOT.'/config.default.php';
+        if (!file_exists($templatePath)) {
+            throw new \Exception("Default config template file not found.");
+        }
+
+        $systemPath = self::trimPath($this->config['system_path'].'/');
+        if (rtrim($this->config['system_path'], '/') !== $systemPath) {
+            $this->config['system_path'] = $systemPath;
+        }
+
+        $content = file_get_contents($templatePath);
+        $replace = [
+            '{DB_HOST}' => self::inputFilter($this->dbHost),
+            '{DB_USER}' => self::inputFilter($this->dbUser),
+            '{DB_PASSWORD}' => self::inputFilter($this->dbPassword),
+            '{DB_NAME}' => self::inputFilter($this->dbName),
+            '{DB_PORT}' => self::inputFilter($this->dbPort),
+            '{SYSTEM_PATH}' => $this->config['system_path'],
+            '{SESSION_ID}' => self::generateRandomString(),
+            '{USER_KEY}' => self::generateRandomString(18),
+            '{IMAGE_KEY}' => self::generateRandomString(18),
+            '{MAINTENANCE_KEY}' => self::generateRandomString(18),
+        ];
+
+        foreach ($replace as $key => $value) {
+            $content = str_replace($key, $value, $content);
+        }
+
+        return $content;
+    }
+
     protected function startGenerateConfigFile()
     {
-        $config_file = self::generateFile(self::CONFIG_ROOT.'/config/'.CONFIG_FILE, $this->getDefaultConfig($this->config));
-        if ($config_file !== true) {
-            return $config_file;
+        $configContent = $this->getConfigContent();
+        $result = self::generateFile($this->config['config_path'].'/'.$this->config['config_file'], $configContent);
+        if ($result !== true) {
+            throw new \Exception("Failed to generate the config file: {$result}");
         }
-        $generate_lock_file['1'] = self::generateFile(self::CONFIG_ROOT.'/config/installed.lock', '');
-        foreach ($generate_lock_file as $generate_lock) {
-            if ($generate_lock !== true) {
-                return $generate_lock;
-            }
+        $lockFileResult = self::generateFile($this->config['config_path'] . '/' . $this->config['lock_file'], '');
+        if ($lockFileResult !== true) {
+            throw new \Exception("Failed to create the lock file: {$lockFileResult}");
         }
 
         return true;

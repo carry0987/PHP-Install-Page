@@ -24,9 +24,9 @@
                 <div class="col-12 col-sm-6 m-auto">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title">{$LANG['database']['database']}</h4>
+                            <h4 id="form-title" class="card-title">{$LANG['database']['database']}</h4>
                             <!-- Database Form -->
-                            <form id="install" action="index.php" method="post" class="needs-validation" novalidate>
+                            <form id="install" method="post" class="needs-validation" novalidate>
                                 <div class="mb-3">
                                     <label for="db_host" class="form-label">{$LANG['database']['db_host']}</label>
                                     <input type="text" class="form-control" name="db_host" id="db_host" value="127.0.0.1" required>
@@ -102,6 +102,9 @@
     <script src="{loadjs ../plugins/jquery/jquery.min.js}"></script>
     <!--Select2-->
     <script src="{loadjs ../plugins/select2/js/select2.min.js}"></script>
+    <!--SweetAlert2-->
+    <script src="{loadjs ../plugins/sweetalert2/sweetalert2.min.js}"></script>
+    <link href="{loadcss ../plugins/sweetalert2/sweetalert2.min.css}" rel="stylesheet" type="text/css" />
     <!--Utils-->
     <script src="{loadjs ../plugins/@carry0987/utils-full/utils-full.min.js}"></script>
     <!--Main-Script-->

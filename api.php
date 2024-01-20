@@ -14,6 +14,14 @@ $result = false;
 // Check request method
 if ($method = RESTful::verifyHttpMethod(true)) {
     $api::setRequest($_POST, $_GET);
+    if (isset($_POST, $_POST['request'])) {
+        switch ($_POST['request']) {
+            case 'start_install':
+                $api::setParam('config_path', __DIR__.'/test/config');
+                $api::setParam('root_path', __DIR__.'/test');
+                break;
+        }
+    }
     $result = $api::fetchResult($method);
 }
 
