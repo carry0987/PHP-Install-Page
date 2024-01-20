@@ -17,5 +17,8 @@
     "password_empty": "密碼不得為空 !",
     "password_rule": "密碼至少要8個字 !",
     "repassword_error": "兩次輸入密碼必須相同 !",
-    "language": "語言"
+    "language": "語言",
+    "file_not_exist": "檔案不存在 !",
+    "file_not_found": "找不到檔案 !",
+    "permission_denied": "權限不足，沒有寫入此檔案/資料夾的權限:"
 }
