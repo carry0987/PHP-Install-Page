@@ -4,5 +4,4 @@
 /.composer.lock export-ignore
 /.gitattributes export-ignore
 /.github export-ignore
-/.gitignore export-ignore
 template/plugins/** linguist-vendored
