@@ -16,7 +16,6 @@ $SYSTEM = array();
 
 // Set path
 define('ROOT_PATH', dirname(__DIR__).'/');
-define('CONFIG_FILE', 'config.inc.php');
 
 // Check HTTPS
 $SYSTEM['https'] = false;

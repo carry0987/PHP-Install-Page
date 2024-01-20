@@ -7,7 +7,6 @@ class Language
 {
     private $path = '/';
     private static $lang;
-    private static $alias = array('en_US' => 'English', 'zh_TW' => '繁體中文');
 
     public function __construct(array $config)
     {
@@ -25,7 +24,6 @@ class Language
             'httponly' => true
         );
         self::$lang = new I18n($config);
-        self::setLangList(self::$alias);
     }
 
     private function setCookie($lang, $security)

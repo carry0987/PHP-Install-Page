@@ -1,7 +1,7 @@
 <?php
 namespace Install;
 
-use carry0987\RESTful\RESTful;
+use Install\Install;
 
 class API
 {
@@ -61,6 +61,9 @@ class API
                     break;
                 case 'set_language':
                     return self::$param['lang']->setLanguage($data['lang'], self::$system['https']);
+                    break;
+                case 'start_install':
+                    $install = new Install(self::$param['lang']);
                     break;
             }
         }
