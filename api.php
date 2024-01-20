@@ -17,8 +17,11 @@ if ($method = RESTful::verifyHttpMethod(true)) {
     if (isset($_POST, $_POST['request'])) {
         switch ($_POST['request']) {
             case 'start_install':
+                $api::setParam('system_path', rtrim(dirname(dirname($_SERVER['PHP_SELF'])), '/'));
                 $api::setParam('config_path', __DIR__.'/test/config');
                 $api::setParam('root_path', __DIR__.'/test');
+                $api::setParam('sql_file', array('data','config'));
+                $api::setParam('check_write_permission', array('cache', 'config', 'template'));
                 break;
         }
     }

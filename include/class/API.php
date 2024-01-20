@@ -64,8 +64,11 @@ class API
                     break;
                 case 'start_install':
                     $config = array(
+                        'system_path' => self::$param['system_path'],
                         'config_path' => self::$param['config_path'],
-                        'root_path' => self::$param['root_path']
+                        'root_path' => self::$param['root_path'],
+                        'sql_file' => self::$param['sql_file'],
+                        'check_write_permission' => self::$param['check_write_permission']
                     );
                     $installer = new Installer(self::$param['lang'], $data, $config);
                     try {
