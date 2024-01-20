@@ -29,6 +29,15 @@ class InstallHelper {
         return true;
     }
 
+    checkPasswordLength = ($element, value) => {
+        if ($element.val().trim().length < 8) {
+            this.showMsg(false, value);
+            return false;
+        }
+        this.showMsg(true, "");
+        return true;
+    }
+
     checkPasswordConfirmation = ($password, $confirmPassword, message) => {
         if ($password.val() !== $confirmPassword.val()) {
             this.showMsg(false, message);
@@ -36,6 +45,23 @@ class InstallHelper {
         }
         this.showMsg(true, "");
         return true;
+    }
+
+    validateInputs = () => {
+        const $inputs = $('#install input').not('[type="submit"]');
+        const isDisplayEmpty = $('#display > span').is(':empty');
+        const isEmpty = $inputs.toArray().some(input => !$.trim($(input).val()).length);
+        
+        $inputs.each(function() {
+            const $input = $(this);
+            if (!$.trim($input.val()).length) {
+                $input.addClass('bg-danger-subtle');
+            } else {
+                $input.removeClass('bg-danger-subtle');
+            }
+        });
+
+        $('#submit').prop('disabled', isEmpty || !isDisplayEmpty);
     }
 
     //Send form data
@@ -81,16 +107,7 @@ class InstallHelper {
 
     async initValidation(config) {
         const self = this;
-        $(document).on('change blur keydown keyup click', function() {
-            let empty = $('input').filter(function() {
-                return $.trim($(this).val()).length == 0
-            }).length == 0;
-            if ($('#checkbox').html() == '' && $('#display').html() == '' && empty === true) {
-                $('button#submit').prop('disabled', false);
-            } else {
-                $('button#submit').prop('disabled', true);
-            }
-        });
+
         // Lang
         const lang = await this.langList();
         console.log(lang);
@@ -102,7 +119,7 @@ class InstallHelper {
                 messageKey: 'username_empty'
             },
             'admin_psw': {
-                method: this.checkInput,
+                method: this.checkPasswordLength,
                 messageKey: 'password_rule'
             },
             'admin_psw_confirm': {
@@ -151,15 +168,28 @@ class InstallHelper {
         });
 
         // Check input before submit
-        $('#install').submit(function(e) {
+        $('#install').on('input', 'input', (event) => {
+            const $input = $(event.target);
+            $input.removeClass('bg-danger-subtle');
+            this.validateInputs();
+        });
+
+        $('#install').on('input blur', 'input', (event) => {
+            this.validateInputs();
+        });
+
+        $('#install').on('submit', (event) => {
+            event.preventDefault();
+            this.validateInputs();
             const isUsernameValid = self.checkInput($('#admin'), lang['install']['username_empty']);
             const isPasswordValid = self.checkInput($('#admin_psw'), lang['install']['password_rule']);
             const isPasswordConfirmValid = self.checkPasswordConfirmation($('#admin_psw'), $('#admin_psw_confirm'), lang['install']['repassword_error']);
             if (!isUsernameValid || !isPasswordValid || !isPasswordConfirmValid) {
-                e.preventDefault();
                 return false;
             }
-            return true;
+            if (!$(event.target).find('#submit').prop('disabled')) {
+                console.log('submit');
+            }
         });
     }
 }
