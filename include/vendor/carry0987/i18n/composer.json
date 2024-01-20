@@ -1,0 +1,22 @@
+{
+    "name": "carry0987/i18n",
+    "description": "A modern internationalization system featuring JSON-format language files and efficient PHP-based caching. Supports dynamic language switching and real-time cache updates, ideal for rapid development and deployment of multilingual websites and applications.",
+    "keywords": ["i18n", "php-i18n", "language"],
+    "type": "library",
+    "require": {
+        "php": ">=8.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "carry0987\\I18n\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "carry0987"
+        }
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

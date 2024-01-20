@@ -1,0 +1,4 @@
+database/ export-ignore
+static/ export-ignore
+template/ export-ignore
+index.php export-ignore

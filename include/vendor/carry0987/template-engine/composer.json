@@ -1,0 +1,23 @@
+{
+    "name": "carry0987/template-engine",
+    "description": "Light & fast php template engine, using Composer",
+    "keywords": ["template", "engine", "template-engine"],
+    "type": "library",
+    "require": {
+        "php": ">=8.0",
+        "carry0987/redis-tool": "^1.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "carry0987\\Template\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "carry0987"
+        }
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

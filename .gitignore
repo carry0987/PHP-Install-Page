@@ -4,6 +4,5 @@
 cache/*
 !cache/index.html
 installed.lock
-include/vendor/*
 **/node_modules/
 package-lock.json

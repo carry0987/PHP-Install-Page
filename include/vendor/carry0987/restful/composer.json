@@ -1,0 +1,25 @@
+{
+    "name": "carry0987/restful",
+    "description": "A simple RESTful API class for PHP, without any framework",
+    "keywords": ["api", "restful", "simple", "lightweight"],
+    "type": "library",
+    "require": {
+        "php": ">=8.0"
+    },
+    "require-dev": {
+        "php": ">=8.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "carry0987\\RESTful\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "carry0987"
+        }
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
