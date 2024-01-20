@@ -1,7 +1,7 @@
 <?php
 namespace Install;
 
-use Install\Install;
+use Install\Installer;
 
 class API
 {
@@ -63,7 +63,8 @@ class API
                     return self::$param['lang']->setLanguage($data['lang'], self::$system['https']);
                     break;
                 case 'start_install':
-                    $install = new Install(self::$param['lang']);
+                    $config = array();
+                    $installer = new Installer(self::$param['lang'], $config);
                     break;
             }
         }
