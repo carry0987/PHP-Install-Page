@@ -5,7 +5,7 @@ use Install\Language;
 use PDO;
 use PDOException;
 
-class Install
+class Installer
 {
     protected $lang;
     protected $config;
@@ -21,24 +21,57 @@ class Install
     protected static $userQuery = 'INSERT INTO user (username, password, group_id, language, last_login, join_date) VALUES (:username, :password, :group_id, :language, :last_login, :join_date)';
 
     const DIR_SEP = DIRECTORY_SEPARATOR;
+    const CONFIG_ROOT = __DIR__.'/../../';
 
     public function __construct(Language $lang, array $config)
     {
         $this->lang = $lang;
         $this->config = $config;
-        // $this->redirectUrl = dirname(dirname($this->getCurrentUrl()));
 
-        $this->dbHost = $this->getInput('db_host', '');
-        $this->dbName = $this->getInput('db_name', '');
-        $this->dbPort = $this->getInput('db_port', '');
-        $this->dbUser = $this->getInput('db_user', '');
-        $this->dbPassword = $this->getInput('db_password', '');
+        $this->dbHost = $this->getInput('db_host');
+        $this->dbName = $this->getInput('db_name');
+        $this->dbPort = $this->getInput('db_port');
+        $this->dbUser = $this->getInput('db_user');
+        $this->dbPassword = $this->getInput('db_password');
         $this->webLang = $this->getInput('lang', 'en_US');
-        $this->adminUsername = $this->getInput('admin_username', '');
-        $this->adminPassword = $this->getInput('admin_password', '');
-        $this->adminPswConfirm = $this->getInput('admin_psw_confirm', '');
+        $this->adminUsername = $this->getInput('admin_username');
+        $this->adminPassword = $this->getInput('admin_password');
+        $this->adminPswConfirm = $this->getInput('admin_psw_confirm');
         $this->validatePassword();
         $this->validateRequiredFields();
+    }
+
+    public function setUserQuery(string $query)
+    {
+        self::$userQuery = $query;
+    }
+
+    public function startInstall()
+    {
+        if ($this->checkInstallStatus() === true) {
+            throw new \Exception($this->lang->getLang('install.already_installed'));
+        }
+        if ($this->checkPermission() !== true) {
+            throw new \Exception($this->checkPermission());
+        }
+        $conn = $this->validateDatabaseConnection();
+        if ($conn !== true) {
+            throw new \Exception($conn);
+        }
+        $createDatabase = $this->startCreateDatabase($conn);
+        if ($createDatabase !== true) {
+            throw new \Exception($createDatabase);
+        }
+        $createAdmin = $this->startCreateAdmin($conn);
+        if ($createAdmin !== true) {
+            throw new \Exception($createAdmin);
+        }
+        $generateConfigFile = $this->startGenerateConfigFile();
+        if ($generateConfigFile !== true) {
+            throw new \Exception($generateConfigFile);
+        }
+
+        return true;
     }
 
     public static function inputFilter(string $value)
@@ -133,12 +166,14 @@ class Install
 
     public static function showErrorMsg($e)
     {
-        echo '<h1>Service unavailable</h1>'."\n";
-        echo '<br/>';
-        echo '<h2>Error Info :'.$e->getMessage().'</h2>';
-        echo '<h3>Error Code :'.$e->getCode().'</h3>'."\n";
-        echo '<h3>Error File :'.$e->getFile().'</h3>'."\n";
-        echo '<h3>Error Line :'.$e->getLine().'</h3>'."\n";
+        $msg = '<h1>Service unavailable</h1>'."\n";
+        $msg .= '<br/>';
+        $msg .= '<h2>Error Info :'.$e->getMessage().'</h2>';
+        $msg .= '<h3>Error Code :'.$e->getCode().'</h3>'."\n";
+        $msg .= '<h3>Error File :'.$e->getFile().'</h3>'."\n";
+        $msg .= '<h3>Error Line :'.$e->getLine().'</h3>'."\n";
+
+        throw new \Exception($msg);
     }
 
     public static function generateRandomString(int $length = 16)
@@ -175,7 +210,7 @@ class Install
         return true;
     }
 
-    protected function getInput($field, $default)
+    protected function getInput(string $field, string $default = '')
     {
         if (isset($_POST[$field])) {
             return self::inputFilter($_POST[$field]);
@@ -226,13 +261,13 @@ class Install
         return $defaultConfig;
     }
 
-    protected function getCurrentUrl()
-    {
-    }
-
     protected function validatePassword()
     {
-        return $this->adminPassword !== $this->adminPswConfirm;
+        if ($this->adminPassword !== $this->adminPswConfirm) {
+            throw new \Exception($this->lang->getLang('install.repassword_error'));
+        }
+
+        return true;
     }
 
     protected function validateRequiredFields()
@@ -284,8 +319,8 @@ class Install
         $sql_file = ['data', 'config', 'template', 'tag', 'inbox_mail', 'area_data', 'social'];
         try {
             foreach ($sql_file as $value) {
-                if (file_exists(CONFIG_ROOT.'/database/'.$value.'.sql')) {
-                    $sql = self::createDatabaseTable($conn, CONFIG_ROOT.'/database/'.$value.'.sql');
+                if (file_exists(self::CONFIG_ROOT.'/database/'.$value.'.sql')) {
+                    $sql = self::createDatabaseTable($conn, self::CONFIG_ROOT.'/database/'.$value.'.sql');
                     if ($sql !== true) {
                         return $sql;
                     }
@@ -294,8 +329,8 @@ class Install
                 }
             }
             //Check Mroonga Support
-            if (self::checkMroongaSupport($conn) === true && file_exists(CONFIG_ROOT.'/database/fulltext.sql')) {
-                $sql = self::createDatabaseTable($conn, CONFIG_ROOT.'/database/fulltext.sql');
+            if (self::checkMroongaSupport($conn) === true && file_exists(self::CONFIG_ROOT.'/database/fulltext.sql')) {
+                $sql = self::createDatabaseTable($conn, self::CONFIG_ROOT.'/database/fulltext.sql');
                 if ($sql !== true) {
                     return $sql;
                 }
@@ -331,11 +366,11 @@ class Install
 
     protected function startGenerateConfigFile()
     {
-        $config_file = self::generateFile(CONFIG_ROOT.'/config/'.CONFIG_FILE, $this->getDefaultConfig($this->config));
+        $config_file = self::generateFile(self::CONFIG_ROOT.'/config/'.CONFIG_FILE, $this->getDefaultConfig($this->config));
         if ($config_file !== true) {
             return $config_file;
         }
-        $generate_lock_file['1'] = self::generateFile(CONFIG_ROOT.'/config/installed.lock', '');
+        $generate_lock_file['1'] = self::generateFile(self::CONFIG_ROOT.'/config/installed.lock', '');
         foreach ($generate_lock_file as $generate_lock) {
             if ($generate_lock !== true) {
                 return $generate_lock;
