@@ -15,7 +15,7 @@
     "username_empty": "用戶名不得為空 !",
     "password_confirm": "再次輸入密碼",
     "password_empty": "密碼不得為空 !",
-    "password_rule": "密碼至少要6個字 !",
+    "password_rule": "密碼至少要8個字 !",
     "repassword_error": "兩次輸入密碼必須相同 !",
     "language": "語言"
 }
