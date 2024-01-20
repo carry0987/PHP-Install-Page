@@ -1,0 +1,18 @@
+{
+    "config": {
+        "vendor-dir": "include/vendor",
+        "optimize-autoloader": true,
+        "classmap-authoritative": true
+    },
+    "require": {
+        "carry0987/template-engine": "^1.0",
+        "carry0987/restful": "^1.0",
+        "carry0987/i18n": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Install\\": "include/class/"
+        },
+        "classmap": ["include/class/"]
+    }
+}
