@@ -9,13 +9,14 @@
   "scripts": {
     "clean": "for dir in $(find node_modules -maxdepth 1 -type d | tail -n +2); do rm -rf plugins/${dir#node_modules/}; done",
     "copy": "find node_modules -type d -name dist | while read dir; do target=plugins/${dir#node_modules/}; target=${target%/dist}; mkdir -p $target && rsync -av --quiet --exclude='*.ts' $dir/ $target/; done",
-    "clear-bootstrap-js": "find plugins/bootstrap/js ! -name 'bootstrap.min.js' ! -name 'bootstrap.min.js.map' -type f -delete",
     "clear-bootstrap-css": "find plugins/bootstrap/css ! -name 'bootstrap.min.css' ! -name 'bootstrap.min.css.map' -type f -delete",
     "clear-jquery": "find plugins/jquery ! -name 'jquery.min.js' -type f -delete",
     "clear-select2": "find plugins/select2 ! -name 'select2.min.js' ! -name 'select2.min.css' -type f -delete",
     "clear-sweetalert2": "find plugins/sweetalert2 ! -name 'sweetalert2.min.js' ! -name 'sweetalert2.min.css' -type f -delete",
     "clear-empty": "find plugins -type d -empty -delete",
+    "remove-bootstrap-js": "rm -rvf plugins/bootstrap/js",
     "remove-object-assign": "rm -rvf plugins/object.assign",
+    "remove-popperjs": "rm -rvf plugins/@popperjs",
     "dist": "run-s clean copy clear-* remove-*"
   },
   "devDependencies": {
