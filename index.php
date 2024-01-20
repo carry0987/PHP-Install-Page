@@ -20,5 +20,6 @@ $template->setOptions($options);
 
 // Set template parameters
 $date = date('Y-m-d');
+$version = 'v1.0.0';
 
 include($template->loadTemplate('index.html'));
