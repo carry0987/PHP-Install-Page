@@ -86,6 +86,10 @@ Also, with **`array`**
 <!--{eval $current_page = array('index','test')}-->
 <link href="{loadcss model.css $current_page}" rel="stylesheet" type="text/css">
 ```
+Or **`string`**, seperate by `,`
+```html
+<link href="{loadcss model.css index,test}" rel="stylesheet" type="text/css">
+```
 CSS
 ```css
 /*[index]*/

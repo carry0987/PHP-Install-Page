@@ -9,9 +9,14 @@ class RedisTool
     private $redis = null;
     private $retryTimes;
 
-    public function __construct(string $host, int $port, string $pwd, int $database, int $retryTimes = 3)
+    public function __construct(array $config, int $retryTimes = 3)
     {
         if (!class_exists('Redis')) throw new Exception('Class Redis does not exist !');
+
+        // Get config
+        [$host, $port, $pwd, $database] = self::setConfig($config);
+
+        // Connect to Redis
         $this->retryTimes = $retryTimes;
         try {
             $this->redis = new \Redis();
@@ -22,11 +27,21 @@ class RedisTool
             if ($count >= $this->retryTimes) {
                 throw new Exception('Unable to connect to Redis');
             }
-            $this->redis->auth($pwd);
+            if ($pwd !== null) $this->redis->auth($pwd);
             $this->redis->select($database);
         } catch (RedisException $e) {
             throw new Exception($e->getMessage());
         }
+    }
+
+    private static function setConfig(array $config): array
+    {
+        $host = $config['host'] ?? '127.0.0.1';
+        $port = $config['port'] ?? 6379;
+        $pwd = $config['password'] ?? null;
+        $database = $config['database'] ?? 0;
+
+        return [$host, $port, $pwd, $database];
     }
 
     private function isConnected()
@@ -44,7 +59,7 @@ class RedisTool
         return $this->redis;
     }
 
-    public function setValue(string $key, $value, int $ttl = 86400)
+    public function setValue(string $key, $value, ?int $ttl = 86400)
     {
         if (!$this->isConnected()) return false;
         if ($ttl !== null) {
@@ -61,7 +76,7 @@ class RedisTool
         return $this->setValue($indexKey, $value);
     }
 
-    public function setHashValue(string $hash, string $key, $value, int $ttl = 86400)
+    public function setHashValue(string $hash, string $key, $value, ?int $ttl = 86400)
     {
         if (!$this->isConnected()) return false;
         $this->redis->multi();

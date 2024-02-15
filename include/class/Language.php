@@ -93,7 +93,7 @@ class Language
 
     public function setLanguage($get_lang, $get_security)
     {
-        foreach (self::$alias as $key => $value) {
+        foreach (self::$lang->getLangAlias() as $key => $value) {
             if ($get_lang === $key) {
                 return $this->setCookie($key, $get_security);
             }

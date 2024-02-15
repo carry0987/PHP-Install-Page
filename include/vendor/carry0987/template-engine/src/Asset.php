@@ -290,10 +290,7 @@ class Asset
     //Load CSS Template
     public function loadCSSTemplate(string $file, array|string $place)
     {
-        if (is_array($place)) {
-            $place = (count($place) > 1) ? $place : $place[0];
-        }
-        $this->place = $place;
+        $this->place = Utils::sliceString($place);
         if ($this->connectdb !== null || $this->redis !== null) {
             $css_file = $this->trimCSSName($file);
             if (!empty($place)) {

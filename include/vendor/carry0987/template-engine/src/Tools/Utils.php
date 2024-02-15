@@ -44,6 +44,17 @@ class Utils
         return true;
     }
 
+    public static function sliceString(string|array $value): array|string
+    {
+        if (is_array($value)) return (count($value) === 1) ? array_pop($value) : $value;
+
+        $filtered = array_filter(explode(',', $value), function($str) {
+            return !empty($str);
+        });
+
+        return (count($filtered) === 1) ? array_pop($filtered) : array_values($filtered);
+    }
+
     /**
      * Generates cryptographically secure random strings
      * 
