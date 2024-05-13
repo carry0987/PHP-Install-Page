@@ -62,6 +62,13 @@ class API
                 case 'set_language':
                     return self::$param['lang']->setLanguage($data['lang'], self::$system['https']);
                     break;
+                case 'check_installed':
+                    $config = array(
+                        'config_path' => self::$param['config_path']
+                    );
+                    $installer = new Installer(self::$param['lang'], $data, $config);
+                    return $installer->checkInstalled();
+                    break;
                 case 'start_install':
                     $config = array(
                         'system_path' => self::$param['system_path'],

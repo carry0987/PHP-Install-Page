@@ -11,6 +11,9 @@ class InstallHelper {
 
     /* Init */
     init(config = null) {
+        // Check installed
+        this.checkInstalled();
+
         return this.initValidation(config);
     }
 
@@ -120,6 +123,29 @@ class InstallHelper {
     //Get language option
     langOption = () => {
         return this.fetchData({ request: 'get_language_list' }, data => data);
+    }
+
+    async checkInstalled() {
+        // Empty form
+        const formData = new FormData();
+        // Lang
+        const lang = await this.langList();
+
+        this.sendFormData('api.php', formData, 'POST', function(res) {
+            Swal.hideLoading();
+            if (res === false) {
+                Swal.fire({
+                    icon: 'error',
+                    html: lang['install']['installed']+'<br>'+lang['install']['install_remove']
+                }).then((result) => {
+                    // if (result.isConfirmed) {
+                    //     window.location.href = 'index.php';
+                    // }
+                });
+            }
+        }, function(error) {
+            self.showSwal('Error', error, 'error');
+        });
     }
 
     async initValidation(config) {

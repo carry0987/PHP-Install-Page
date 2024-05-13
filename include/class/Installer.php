@@ -80,6 +80,15 @@ class Installer
         return true;
     }
 
+    public function checkInstalled()
+    {
+        if ($this->checkInstallStatus() === true) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static function inputFilter(string $value)
     {
         $value = str_replace("'", "\"", "$value");
