@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "dependencies": {
     "@carry0987/utils-full": "^1.1.3",
     "bootstrap": "^5.3.2",
@@ -7,9 +8,9 @@
     "sweetalert2": "^11.10.5"
   },
   "scripts": {
-    "build": "BUILD=development node dist/build.mjs",
-    "build:watch": "BUILD=watch node dist/build.mjs",
-    "build:production": "BUILD=production node dist/build.mjs",
+    "build": "npx tsc -p dist/tsconfig-build.json && BUILD=development node dist/build.js",
+    "build:watch": "npx tsc -p dist/tsconfig-build.json && BUILD=watch node dist/build.js",
+    "build:production": "npx tsc -p dist/tsconfig-build.json && BUILD=production node dist/build.js",
     "clean": "for dir in $(find node_modules -maxdepth 1 -type d | tail -n +2); do rm -rf plugins/${dir#node_modules/}; done",
     "copy": "find node_modules -type d -name dist | while read dir; do target=plugins/${dir#node_modules/}; target=${target%/dist}; mkdir -p $target && rsync -av --quiet --exclude='*.ts' $dir/ $target/; done",
     "clear-bootstrap-css": "find plugins/bootstrap/css ! -name 'bootstrap.min.css' ! -name 'bootstrap.min.css.map' -type f -delete",
@@ -28,6 +29,7 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/jquery": "^3.5.29",
+    "@types/node": "^20.12.11",
     "@types/select2": "^4.0.63",
     "del": "^7.1.0",
     "npm-run-all": "^4.1.5",
