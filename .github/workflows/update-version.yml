@@ -40,7 +40,7 @@ jobs:
           VERSION=${{ needs.update-version.outputs.version }}
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Dump version to $VERSION"
-          sed -i "s/$version = '.*'/$version = '$VERSION'/" index.php
+          sed -i "s/$version = '.*'/$version = 'v$VERSION'/" index.php
 
       - name: Commit changes
         uses: EndBug/add-and-commit@v9
