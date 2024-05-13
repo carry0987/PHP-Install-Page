@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => '__root__',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => NULL,
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
+        'reference' => 'a1c11d382fea2ad56fa838ca44eb891a3e241f11',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../../',
         'aliases' => array(),
@@ -11,18 +11,18 @@
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => NULL,
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'reference' => 'a1c11d382fea2ad56fa838ca44eb891a3e241f11',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../../',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
         'carry0987/i18n' => array(
-            'pretty_version' => '2.1.2',
-            'version' => '2.1.2.0',
-            'reference' => '524d6b3e4e21cbefee5712e95f2a83d4f436b88a',
+            'pretty_version' => '2.1.3',
+            'version' => '2.1.3.0',
+            'reference' => 'f6711da5466552297ada934430f126ba22241180',
             'type' => 'library',
             'install_path' => __DIR__ . '/../carry0987/i18n',
             'aliases' => array(),

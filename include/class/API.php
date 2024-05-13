@@ -66,7 +66,7 @@ class API
                     $config = array(
                         'config_path' => self::$param['config_path']
                     );
-                    $installer = new Installer(self::$param['lang'], $data, $config);
+                    $installer = new Installer(self::$param['lang'], null, $config);
                     return $installer->checkInstalled();
                     break;
                 case 'start_install':

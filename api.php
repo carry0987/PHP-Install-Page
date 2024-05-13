@@ -16,6 +16,7 @@ if ($method = RESTful::verifyHttpMethod(true)) {
     $api::setRequest($_POST, $_GET);
     if (isset($_POST, $_POST['request'])) {
         switch ($_POST['request']) {
+            case 'check_installed':
             case 'start_install':
                 $api::setParam('system_path', rtrim(dirname(dirname($_SERVER['PHP_SELF'])), '/'));
                 $api::setParam('config_path', __DIR__.'/test/config');

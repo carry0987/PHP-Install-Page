@@ -24,21 +24,23 @@ class Installer
     const DIR_SEP = DIRECTORY_SEPARATOR;
     const CONFIG_ROOT = __DIR__.'/../../';
 
-    public function __construct(Language $lang, array $data, array $config = [])
+    public function __construct(Language $lang, ?array $data, array $config = [])
     {
         $this->lang = $lang;
         $this->data = $data;
         $this->config = array_merge($this->getDefaultConfigValue(), $config);
 
-        $this->dbHost = $this->getInput('db_host');
-        $this->dbName = $this->getInput('db_name');
-        $this->dbPort = $this->getInput('db_port');
-        $this->dbUser = $this->getInput('db_user');
-        $this->dbPassword = $this->getInput('db_password');
-        $this->webLang = $this->getInput('lang', 'en_US');
-        $this->adminUsername = $this->getInput('admin_username');
-        $this->adminPassword = $this->getInput('admin_password');
-        $this->adminPswConfirm = $this->getInput('admin_psw_confirm');
+        if (is_array($data)) {
+            $this->dbHost = $this->getInput('db_host');
+            $this->dbName = $this->getInput('db_name');
+            $this->dbPort = $this->getInput('db_port');
+            $this->dbUser = $this->getInput('db_user');
+            $this->dbPassword = $this->getInput('db_password');
+            $this->webLang = $this->getInput('lang', 'en_US');
+            $this->adminUsername = $this->getInput('admin_username');
+            $this->adminPassword = $this->getInput('admin_password');
+            $this->adminPswConfirm = $this->getInput('admin_psw_confirm');
+        }
     }
 
     public function setUserQuery(string $query)
@@ -82,11 +84,7 @@ class Installer
 
     public function checkInstalled()
     {
-        if ($this->checkInstallStatus() === true) {
-            return true;
-        }
-
-        return false;
+        return $this->checkInstallStatus();
     }
 
     public static function inputFilter(string $value)
