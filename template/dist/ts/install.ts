@@ -125,9 +125,17 @@ class InstallHelper {
             showCancelButton: false,
             showCloseButton: false,
             showDenyButton: false,
-            showConfirmButton: false
+            showConfirmButton: false,
+            allowOutsideClick: !showLoading,
+            allowEnterKey: !showLoading,
+            allowEscapeKey: !showLoading
         };
         swal_config = Utils.deepMerge({} as SwalConfig, swal_config, popupOptions);
+        if (showLoading && !swal_config.didOpen) {
+            swal_config.didOpen = () => {
+                Swal.showLoading();
+            }
+        }
         const popResult = await Swal.fire(swal_config).then((result) => {
             if (beforeConfirm) beforeConfirm(result);
             if (result.isConfirmed || result.isDismissed) {
@@ -135,7 +143,6 @@ class InstallHelper {
             }
             return result;
         });
-        if (showLoading) Swal.showLoading();
 
         return popResult;
     }
@@ -153,9 +160,10 @@ class InstallHelper {
             Swal.hideLoading();
             if (res === true) {
                 $('#install, #form-title').hide();
-                await Swal.fire({
+                await this.showSwal({
                     icon: 'error',
-                    text: lang['install']['installed']
+                    text: lang['install']['installed'],
+                    showConfirmButton: true
                 }).then((result: any) => {
                     if (result.isConfirmed) {
                         window.location.href = InstallHelper.backURL;
@@ -240,7 +248,7 @@ class InstallHelper {
             this.validateInputs();
         });
 
-        $('#install').on('submit', (event) => {
+        $('#install').on('submit', async (event) => {
             event.preventDefault();
             this.validateInputs();
             const isUsernameValid = this.checkInput($('#admin'), lang['install']['username_empty']);
@@ -255,7 +263,7 @@ class InstallHelper {
                 for (let [key, value] of formData.entries()) {
                     formObject[key] = value;
                 }
-                Swal.fire({
+                await this.showSwal({
                     text: lang['install']['installing'],
                     showConfirmButton: false,
                     allowOutsideClick: false,
@@ -271,10 +279,10 @@ class InstallHelper {
                             allowEnterKey: false,
                             allowEscapeKey: false,
                             showLoading: true,
-                            willOpen: () => {
+                            willOpen: async () => {
                                 $('#install, #form-title').hide();
                                 formObject['request'] = 'start_install';
-                                this.sendFormData('api.php', formObject, 'POST', function(res) {
+                                await this.sendFormData('api.php', formObject, 'POST', function(res) {
                                     Swal.hideLoading();
                                     if (res['status'] === true) {
                                         Swal.fire({
