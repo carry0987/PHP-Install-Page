@@ -10,6 +10,7 @@ if (!$) throw new Error('jQuery not found');
 class InstallHelper {
     private act_btn: Record<string, any>;
     private inputActions: Record<string, any> = {};
+    private static backURL: string = '../';
 
     constructor() {
         this.act_btn = {};
@@ -156,7 +157,7 @@ class InstallHelper {
                     text: lang['install']['installed']
                 }).then((result: any) => {
                     if (result.isConfirmed) {
-                        window.location.href = '../';
+                        window.location.href = InstallHelper.backURL;
                     }
                 });
             }
@@ -279,7 +280,7 @@ class InstallHelper {
                                             html: lang['install']['install_success']+'<br>'+lang['install']['install_remove'],
                                         }).then((result) => {
                                             if (result.isConfirmed) {
-                                                window.location.href = 'index.php';
+                                                window.location.href = InstallHelper.backURL;
                                             }
                                         });
                                     } else {
