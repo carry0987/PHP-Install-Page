@@ -11,6 +11,7 @@ export type PopupOptions = SwalConfig & {
     denyButtonText?: string,
     beforeConfirm?: (result: any) => void | null,
     callback?: (result: any) => void | null,
+    showLoading?: boolean
 }
 export type SwalConfig = SweetAlertOptions & {
     template?: string,

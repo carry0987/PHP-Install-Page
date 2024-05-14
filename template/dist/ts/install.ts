@@ -113,7 +113,7 @@ class InstallHelper {
     }
 
     private async showSwal(popupOptions: PopupOptions): Promise<SweetAlertResult> {
-        const { title, text, html, beforeConfirm, callback } = popupOptions;
+        const { title, text, html, beforeConfirm, callback, showLoading } = popupOptions;
         // Remove callback from popupOptions
         delete popupOptions.callback;
         // Build SwalConfig
@@ -135,6 +135,7 @@ class InstallHelper {
             }
             return result;
         });
+        if (showLoading) Swal.showLoading();
 
         return popResult;
     }
@@ -269,6 +270,7 @@ class InstallHelper {
                             allowOutsideClick: false,
                             allowEnterKey: false,
                             allowEscapeKey: false,
+                            showLoading: true,
                             willOpen: () => {
                                 $('#install, #form-title').hide();
                                 formObject['request'] = 'start_install';
