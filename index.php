@@ -19,6 +19,6 @@ $template = new Template\Template;
 $template->setOptions($options);
 
 // Set template parameters
-$version = 'v1.1.2';
+$version = 'v1.1.3';
 
 include($template->loadTemplate('index.html'));
