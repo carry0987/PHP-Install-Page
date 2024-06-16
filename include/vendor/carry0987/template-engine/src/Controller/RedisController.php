@@ -14,7 +14,7 @@ class RedisController
             $this->redis = $redisConfig;
         }
         if ($this->redis === null && is_array($redisConfig)) {
-            $this->redis = new RedisTool($redisConfig['host']);
+            $this->redis = new RedisTool($redisConfig);
         }
 
         return $this;
@@ -44,12 +44,12 @@ class RedisController
         return false;
     }
 
-    public function createVersion(string $tpl_path, string $tpl_name, string $tpl_type, string $tpl_md5, int $tpl_expire_time, string $tpl_verhash)
+    public function createVersion(string $tpl_path, string $tpl_name, string $tpl_type, string $tpl_hash, int $tpl_expire_time, string $tpl_verhash)
     {
         if ($this->redis === null) return false;
         $tpl_key = "template::$tpl_path::$tpl_name::$tpl_type";
         $tpl_data = [
-            "tpl_md5" => $tpl_md5,
+            "tpl_hash" => $tpl_hash,
             "tpl_expire_time" => $tpl_expire_time,
             "tpl_verhash" => $tpl_verhash,
         ];
@@ -57,14 +57,14 @@ class RedisController
         return $this->redis->setHashValue($this->hash, $tpl_key, serialize($tpl_data));
     }
 
-    public function updateVersion(string $tpl_path, string $tpl_name, string $tpl_type, string $tpl_md5, int $tpl_expire_time, string $tpl_verhash)
+    public function updateVersion(string $tpl_path, string $tpl_name, string $tpl_type, string $tpl_hash, int $tpl_expire_time, string $tpl_verhash)
     {
-        return $this->createVersion($tpl_path, $tpl_name, $tpl_type, $tpl_md5, $tpl_expire_time, $tpl_verhash);
+        return $this->createVersion($tpl_path, $tpl_name, $tpl_type, $tpl_hash, $tpl_expire_time, $tpl_verhash);
     }
 
-    public function getTemplateByMd5(string $tpl_md5)
+    public function getTemplateByHash(string $tpl_hash)
     {
-        $tpl_id = $this->redis->getValue('tpl_md5:'.$tpl_md5);
+        $tpl_id = $this->redis->getValue('tpl_hash:'.$tpl_hash);
         if ($tpl_id) {
             $tpl_data = $this->redis->getHashValue('template', 'template:'.$tpl_id);
             return $tpl_data ? unserialize($tpl_data) : null;

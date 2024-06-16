@@ -1,0 +1,38 @@
+{
+    "name": "carry0987/sanite",
+    "description": "A PHP library that provide base CRUD structure and methods, using PDO.",
+    "type": "library",
+    "require": {
+        "php": ">=8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.2"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "carry0987\\Sanite\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "carry0987\\Sanite\\Example\\": "example/class/",
+            "carry0987\\Sanite\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "carry0987"
+        }
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
+    "config": {
+        "platform": {
+            "php": "8.2.0"
+        }
+    }
+}

@@ -2,93 +2,62 @@
 namespace carry0987\Template\Controller;
 
 use carry0987\Template\Exception\ControllerException;
+use carry0987\Template\Controller\Model\ {
+    CreateModel,
+    ReadModel,
+    UpdateModel
+};
+use carry0987\Sanite\Sanite;
 
 class DBController
 {
-    private $db = null;
-    private static $table = 'template';
+    private Sanite $sanite;
+    private ReadModel $read;
+    private CreateModel $create;
+    private UpdateModel $update;
 
-    public function __construct(mixed $dbSettings)
+    public function __construct(array|\PDO|Sanite $dbConfig)
     {
-        if ($dbSettings instanceof \PDO) {
-            $this->db = $dbSettings;
+        if ($dbConfig instanceof Sanite) {
+            $this->sanite = $dbConfig;
+        } else {
+            $this->sanite = new Sanite($dbConfig);
         }
-        if ($this->db === null && is_array($dbSettings)) {
-            try {
-                $this->db = new \PDO('mysql:host='.$dbSettings['host'].';port='.$dbSettings['port'].';dbname='.$dbSettings['database'], $dbSettings['username'], $dbSettings['password']);
-            } catch (\PDOException $e) {
-                throw new ControllerException($e->getMessage(), $e->getCode());
-            }
-        }
-
-        return $this;
+        $this->read = new ReadModel($this->sanite);
+        $this->create = new CreateModel($this->sanite);
+        $this->update = new UpdateModel($this->sanite);
     }
 
-    public function isConnected()
+    public function isConnected(): bool
     {
-        return $this->db !== null;
+        return !empty($this->sanite->getConnection());
     }
 
-    public function setTableName(string $table)
+    public function setTableName(string $table): void
     {
-        self::$table = $table;
-
-        return $this;
-    }
-
-    public function getVersion(string $tpl_path, string $tpl_name, string $tpl_type)
-    {
-        $tpl_query = 'SELECT tpl_md5, tpl_expire_time, tpl_verhash FROM '.self::$table.'
-            WHERE tpl_path = :path AND tpl_name = :name AND tpl_type = :type';
-        try {
-            $tpl_stmt = $this->db->prepare($tpl_query);
-            $tpl_stmt->execute([':path' => $tpl_path, ':name' => $tpl_name, ':type' => $tpl_type]);
-            $tpl_row = $tpl_stmt->fetch(\PDO::FETCH_ASSOC);
-            if ($tpl_row != false) {
-                return $tpl_row;
-            }
-            return false;
-        } catch (\PDOException $e) {
-            throw new ControllerException($e->getMessage(), $e->getCode());
+        if ($this->read === null || $this->create === null || $this->update === null) {
+            throw new ControllerException('Model is not set', 500);
         }
+
+        $this->read::$table = $table;
+        $this->create::$table = $table;
+        $this->update::$table = $table;
     }
 
-    public function createVersion(string $tpl_path, string $tpl_name, string $tpl_type, string $tpl_md5, int $tpl_expire_time, string $tpl_verhash)
+    public function getVersion(string $tpl_path, string $tpl_name, string $tpl_type): array|false
     {
-        $tpl_query = 'INSERT INTO '.self::$table.' (tpl_path, tpl_name, tpl_type, tpl_md5, tpl_expire_time, tpl_verhash)
-            VALUES (:path, :name, :type, :md5, :expire_time, :verhash)';
-        try {
-            $tpl_stmt = $this->db->prepare($tpl_query);
-            $tpl_stmt->execute([
-                ':path' => $tpl_path,
-                ':name' => $tpl_name,
-                ':type' => $tpl_type,
-                ':md5' => $tpl_md5,
-                ':expire_time' => $tpl_expire_time,
-                ':verhash' => $tpl_verhash
-            ]);
-        } catch (\PDOException $e) {
-            throw new ControllerException($e->getMessage(), $e->getCode());
-        }
+        $version = $this->read->getVersion($tpl_path, $tpl_name, $tpl_type);
+
+        return empty($version) ? false : $version;
     }
 
-    public function updateVersion(string $tpl_path, string $tpl_name, string $tpl_type, string $tpl_md5, int $tpl_expire_time, string $tpl_verhash)
+    public function updateVersion(string $tpl_path, string $tpl_name, string $tpl_type, string $tpl_hash, int $tpl_expire_time, string $tpl_verhash): bool
     {
-        $tpl_query = 'UPDATE '.self::$table.'
-            SET tpl_md5 = :md5, tpl_expire_time = :expire_time, tpl_verhash = :verhash
-            WHERE tpl_path = :path AND tpl_name = :name AND tpl_type = :type';
-        try {
-            $tpl_stmt = $this->db->prepare($tpl_query);
-            $tpl_stmt->execute([
-                ':md5' => $tpl_md5,
-                ':expire_time' => $tpl_expire_time,
-                ':verhash' => $tpl_verhash,
-                ':path' => $tpl_path,
-                ':name' => $tpl_name,
-                ':type' => $tpl_type
-            ]);
-        } catch (\PDOException $e) {
-            throw new ControllerException($e->getMessage(), $e->getCode());
-        }
+        return $this->update->updateVersion($tpl_path, $tpl_name, $tpl_type, $tpl_hash, $tpl_expire_time, $tpl_verhash);
+    }
+
+    public function createVersion(string $tpl_path, string $tpl_name, string $tpl_type, string $tpl_hash, int $tpl_expire_time, string $tpl_verhash): bool
+    {
+        return $this->create->createVersion($tpl_path, $tpl_name, $tpl_type, $tpl_hash, $tpl_expire_time, $tpl_verhash);
     }
 }

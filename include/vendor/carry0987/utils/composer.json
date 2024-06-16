@@ -1,0 +1,21 @@
+{
+    "name": "carry0987/utils",
+    "description": "This Utils library provides a collection of static methods designed to help in various common tasks encountered in PHP development. From manipulating arrays and strings to handling date-time conversions and file paths, this library aims to be a handy tool for PHP developers.",
+    "type": "library",
+    "require": {
+        "php": ">=8"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "carry0987\\Utils\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "carry0987"
+        }
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

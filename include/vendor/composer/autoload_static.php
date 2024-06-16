@@ -9,7 +9,9 @@ class ComposerStaticInitb6b524a3edd6e00a01c4ccc0a46de5e0
     public static $prefixLengthsPsr4 = array (
         'c' => 
         array (
+            'carry0987\\Utils\\' => 16,
             'carry0987\\Template\\' => 19,
+            'carry0987\\Sanite\\' => 17,
             'carry0987\\Redis\\' => 16,
             'carry0987\\RESTful\\' => 18,
             'carry0987\\I18n\\' => 15,
@@ -21,9 +23,17 @@ class ComposerStaticInitb6b524a3edd6e00a01c4ccc0a46de5e0
     );
 
     public static $prefixDirsPsr4 = array (
+        'carry0987\\Utils\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/carry0987/utils/src',
+        ),
         'carry0987\\Template\\' => 
         array (
             0 => __DIR__ . '/..' . '/carry0987/template-engine/src',
+        ),
+        'carry0987\\Sanite\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/carry0987/sanite/src',
         ),
         'carry0987\\Redis\\' => 
         array (
@@ -59,8 +69,23 @@ class ComposerStaticInitb6b524a3edd6e00a01c4ccc0a46de5e0
         'carry0987\\I18n\\Language\\LanguageLoader' => __DIR__ . '/..' . '/carry0987/i18n/src/Language/LanguageLoader.php',
         'carry0987\\RESTful\\RESTful' => __DIR__ . '/..' . '/carry0987/restful/src/RESTful.php',
         'carry0987\\Redis\\RedisTool' => __DIR__ . '/..' . '/carry0987/redis-tool/src/RedisTool.php',
+        'carry0987\\Sanite\\Exceptions\\DatabaseException' => __DIR__ . '/..' . '/carry0987/sanite/src/Exceptions/DatabaseException.php',
+        'carry0987\\Sanite\\Exceptions\\UtilsException' => __DIR__ . '/..' . '/carry0987/sanite/src/Exceptions/UtilsException.php',
+        'carry0987\\Sanite\\Interfaces\\DataCreateInterface' => __DIR__ . '/..' . '/carry0987/sanite/src/Interfaces/DataCreateInterface.php',
+        'carry0987\\Sanite\\Interfaces\\DataDeleteInterface' => __DIR__ . '/..' . '/carry0987/sanite/src/Interfaces/DataDeleteInterface.php',
+        'carry0987\\Sanite\\Interfaces\\DataReadInterface' => __DIR__ . '/..' . '/carry0987/sanite/src/Interfaces/DataReadInterface.php',
+        'carry0987\\Sanite\\Interfaces\\DataUpdateInterface' => __DIR__ . '/..' . '/carry0987/sanite/src/Interfaces/DataUpdateInterface.php',
+        'carry0987\\Sanite\\Models\\DataCreateModel' => __DIR__ . '/..' . '/carry0987/sanite/src/Models/DataCreateModel.php',
+        'carry0987\\Sanite\\Models\\DataDeleteModel' => __DIR__ . '/..' . '/carry0987/sanite/src/Models/DataDeleteModel.php',
+        'carry0987\\Sanite\\Models\\DataReadModel' => __DIR__ . '/..' . '/carry0987/sanite/src/Models/DataReadModel.php',
+        'carry0987\\Sanite\\Models\\DataUpdateModel' => __DIR__ . '/..' . '/carry0987/sanite/src/Models/DataUpdateModel.php',
+        'carry0987\\Sanite\\Sanite' => __DIR__ . '/..' . '/carry0987/sanite/src/Sanite.php',
+        'carry0987\\Sanite\\Utils\\DBUtil' => __DIR__ . '/..' . '/carry0987/sanite/src/Utils/DBUtil.php',
         'carry0987\\Template\\Asset' => __DIR__ . '/..' . '/carry0987/template-engine/src/Asset.php',
         'carry0987\\Template\\Controller\\DBController' => __DIR__ . '/..' . '/carry0987/template-engine/src/Controller/DBController.php',
+        'carry0987\\Template\\Controller\\Model\\CreateModel' => __DIR__ . '/..' . '/carry0987/template-engine/src/Controller/Model/CreateModel.php',
+        'carry0987\\Template\\Controller\\Model\\ReadModel' => __DIR__ . '/..' . '/carry0987/template-engine/src/Controller/Model/ReadModel.php',
+        'carry0987\\Template\\Controller\\Model\\UpdateModel' => __DIR__ . '/..' . '/carry0987/template-engine/src/Controller/Model/UpdateModel.php',
         'carry0987\\Template\\Controller\\RedisController' => __DIR__ . '/..' . '/carry0987/template-engine/src/Controller/RedisController.php',
         'carry0987\\Template\\Exception\\AssetException' => __DIR__ . '/..' . '/carry0987/template-engine/src/Exception/AssetException.php',
         'carry0987\\Template\\Exception\\ControllerException' => __DIR__ . '/..' . '/carry0987/template-engine/src/Exception/ControllerException.php',
@@ -68,6 +93,8 @@ class ComposerStaticInitb6b524a3edd6e00a01c4ccc0a46de5e0
         'carry0987\\Template\\Template' => __DIR__ . '/..' . '/carry0987/template-engine/src/Template.php',
         'carry0987\\Template\\Tools\\Minifier' => __DIR__ . '/..' . '/carry0987/template-engine/src/Tools/Minifier.php',
         'carry0987\\Template\\Tools\\Utils' => __DIR__ . '/..' . '/carry0987/template-engine/src/Tools/Utils.php',
+        'carry0987\\Utils\\Exceptions\\UtilsException' => __DIR__ . '/..' . '/carry0987/utils/src/Exceptions/UtilsException.php',
+        'carry0987\\Utils\\Utils' => __DIR__ . '/..' . '/carry0987/utils/src/Utils.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
